@@ -1,10 +1,10 @@
 from selenium import webdriver
 import matplotlib.pyplot as  plt
+import csv
 import logging
 
 
 def car_details_to_dict(price='', info_string=''):
-    print(info_string)
     if len(info_string.splitlines()) == 9:
         # defining car details to read out
         car_detail_data_set = {
@@ -20,6 +20,11 @@ def car_details_to_dict(price='', info_string=''):
         list_of_details = info_string.splitlines()
         car_detail_data_set['mileage'] = int(list_of_details[0].split(' ')[0].replace('.', ''))
         car_detail_data_set['construction_year'] = int(list_of_details[1].split('/')[1])
+        car_detail_data_set['power'] = int(list_of_details[2].split('(')[1].split(' ')[0])
+        car_detail_data_set['car_owner'] = int(list_of_details[4].split(' ')[0])
+        car_detail_data_set['transmission'] = list_of_details[5]
+        car_detail_data_set['fuel'] = list_of_details[6]
+        car_detail_data_set['fuel_consumption_per_100_km'] = list_of_details[7].split(' ')[0]
 
         car_detail_data_set['price'] = int(price.split(' ')[1].split(',')[0].replace('.', ''))
 
@@ -29,7 +34,6 @@ def car_details_to_dict(price='', info_string=''):
 
 
 def plotting_car_data(car_data_list = [{}]):
-    print(car_data_list)
     mileage_list = []
     price_list = []
     for car_data in car_data_list:
@@ -41,14 +45,29 @@ def plotting_car_data(car_data_list = [{}]):
     plt.show()
 
 
+def writing_to_car_market_csv(car_data_list = [{}]):
+    with open('Data/car_market_data.csv', 'w') as csv_file:
+        fieldnames = ['mileage', 'price', 'construction_year', 'power', 'car_state', 'car_owner', 'transmission', 'fuel', 'fuel_consumption_per_100_km']
+        csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames, delimiter='\t')
+        csv_writer.writeheader()
+        for line in car_data_list:
+            csv_writer.writerow(line)
+
+def read_car_market_csv():
+    with open(path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter='\t')
+        for line in csv_reader:
+            print(line)
+
+
 #initialization
-num_max_pages = 3
-num_max_delta_km = 3
+num_max_pages = 2
+num_max_delta_km = 1
 delta_km = 10000
 driver = webdriver.Firefox()
 dict_details = []
 
-url = 'https://www.autoscout24.de/lst/audi/q5?sort=standard&desc=0&gear=A&fuel=B&ustate=N%2CU&size=20&page=1&powerfrom=147&powertype=hp&cy=D&kmto=10000&kmfrom=0&fregfrom=2018&atype=C&'
+url = 'https://www.autoscout24.de/lst/mercedes-benz/cla-(alle)?sort=standard&desc=0&fuel=B&ustate=N%2CU&powerfrom=147&powertype=hp&cy=D&kmto=10000&fregfrom=2019&atype=C'
 
 
 for page in range(1, num_max_pages+1):
@@ -69,11 +88,6 @@ for page in range(1, num_max_pages+1):
 
 driver.close() #close web browser
 
-plotting_car_data(dict_details)
+writing_to_car_market_csv(dict_details)
 
-# with open('car_market_data.csv', 'w') as f:
-#     f.write('Mileage in km' + ',' + 'Price in € \n')
-#
-# with open('car_market_data.csv', 'a') as f:
-#     for entry in dict_details:
-#         f.write(str(entry.get('mileage')) + ',' + str(entry.get('price')) + "\n")
+plotting_car_data(dict_details)

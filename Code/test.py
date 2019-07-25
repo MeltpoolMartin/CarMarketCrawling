@@ -1,17 +1,25 @@
-import re
+import csv
+import matplotlib.pyplot as plt
 
-url = 'https://www.autoscout24.de/lst/audi/q5?sort=standard&desc=0&gear=A&fuel=B&ustate=N%2CU&size=20&page=1' \
-      '&powerfrom=147&powertype=hp&cy=D&kmto=10000&kmfrom=0&fregfrom=2018&atype=C&'
+def read_car_market_csv(path):
+    car_market_data = []
+    with open(path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter='\t')
+        for line in csv_reader:
+            car_market_data.append(line)
+        return car_market_data
 
-page_expr = re.compile(r'page=\d')
-mo_page = page_expr.search(url)
-print(mo_page.group())
+def plotting_car_data(car_data_list = [{}]):
+    mileage_list = []
+    price_list = []
+    for car_data in car_data_list:
+        mileage_list.append(car_data.get('mileage'))
+        price_list.append(car_data.get('price'))
+    plt.xlabel('Mileage in km')
+    plt.ylabel('Price in Euro')
+    plt.scatter(mileage_list, price_list)
+    plt.show()
 
-km_expr = re.compile((r'kmto=\d\d\d\d\d&kmfrom=\d\d\d\d\d|\d'))
-mo_km = km_expr.search(url)
-print(mo_km.group())
-
-delta_page = 3
-
-for page in range(delta_page):
-    print(url.replace(mo_page.group(),'page=' + str(page)))
+car_data = read_car_market_csv('/Users/Martin/GitKraken/CarMarketCrawling/Data/car_market_data.csv')
+print(car_data)
+plotting_car_data(car_data)
