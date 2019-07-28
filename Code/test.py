@@ -1,5 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 
 def read_car_market_csv(path):
     car_market_data = []
@@ -10,14 +11,14 @@ def read_car_market_csv(path):
         return car_market_data
 
 def plotting_car_data(car_data_list = [{}]):
-    mileage_list = []
-    price_list = []
+    x = []
+    y = []
     for car_data in car_data_list:
-        mileage_list.append(car_data.get('mileage'))
-        price_list.append(car_data.get('price'))
+        x.append(car_data.get('mileage'))
+        y.append(car_data.get('price'))
     plt.xlabel('Mileage in km')
     plt.ylabel('Price in Euro')
-    plt.scatter(mileage_list, price_list)
+    plt.plot(x, y, 'ro')
     plt.show()
 
 car_data = read_car_market_csv('/Users/Martin/GitKraken/CarMarketCrawling/Data/car_market_data.csv')
