@@ -83,18 +83,17 @@ def read_car_market_csv():
 
 
 #initialization
-num_max_pages = 2
+num_max_pages = 10
 num_max_delta_km = 1
 delta_km = 10000
 driver = webdriver.Firefox()
 dict_details = []
 
-url = 'https://www.autoscout24.de/lst/land-rover/range-rover-evoque?sort=standard&desc=0&eq=140%2C155%2C23&gear=A&fuel=B&doorfrom=4&doorto=5&ustate=N%2CU&page=1&powerfrom=147&powertype=hp&cy=D&kmto=10000&ptype=M&atype=C'
+url = 'https://www.autoscout24.de/lst/land-rover/range-rover-evoque?sort=standard&desc=0&eq=140%2C155%2C23&gear=A&fuel=B&ustate=N%2CU&size=10&page=1&powerfrom=147&powertype=hp&cy=D&kmto=50000&fregfrom=2016&ptype=M&atype=C&'
 
 
-for page in range(1, num_max_pages+1):
-
-    url = url.replace('page=1', 'page=' + str(page))
+for page in range(0, num_max_pages):
+    url = url.replace('page=' + str(page), 'page=' + str(page+1))
     print(url)
     driver.get(url) #open web browser with specific url
 
