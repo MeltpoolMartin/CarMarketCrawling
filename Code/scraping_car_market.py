@@ -67,48 +67,57 @@ def plotting_car_data(car_data_list = [{}]):
     plt.show()
 
 
-def writing_to_car_market_csv(path, car_data_list = [{}]):
-    with open(os.path.join(path, 'car_market_data.csv'), 'w') as csv_file:
+def writing_to_car_market_csv(name, path, car_data_list = [{}]):
+    with open(os.path.join(path, name + '.csv'), 'w') as csv_file:
         fieldnames = ['mileage', 'price', 'construction_year', 'power', 'car_state', 'car_owner', 'transmission', 'fuel', 'fuel_consumption_per_100_km']
         csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames, delimiter='\t')
         csv_writer.writeheader()
         for line in car_data_list:
             csv_writer.writerow(line)
 
-def read_car_market_csv():
+def read_car_market_csv(path):
     with open(path, 'r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter='\t')
         for line in csv_reader:
             print(line)
 
 
-#initialization
-num_max_pages = 10
-num_max_delta_km = 1
-delta_km = 10000
-driver = webdriver.Firefox()
-dict_details = []
 
-url = 'https://www.autoscout24.de/lst/land-rover/range-rover-evoque?sort=standard&desc=0&eq=140%2C155%2C23&gear=A&fuel=B&ustate=N%2CU&size=10&page=1&powerfrom=147&powertype=hp&cy=D&kmto=50000&fregfrom=2016&ptype=M&atype=C&'
+if __name__ == "__main__":
+    #initialization
+    num_max_pages = 3
+    num_max_delta_km = 1
+    delta_km = 10000
+    driver = webdriver.Firefox()
+    dict_details = []
+
+    #User prompt
+    #print('Please enter the URL of the web site')
+    #url = input('URL: ')
+    url = 'https://www.autoscout24.de/lst/land-rover/range-rover-evoque?sort=standard&desc=0&eq=140%2C155%2C23&gear=A&fuel=B&doorfrom=4&doorto=5&ustate=N%2CU&page=1&powerfrom=147&powertype=hp&cy=D&kmto=10000&ptype=M&atype=C'
 
 
-for page in range(0, num_max_pages):
-    url = url.replace('page=' + str(page), 'page=' + str(page+1))
-    print(url)
-    driver.get(url) #open web browser with specific url
+    for page in range(0, num_max_pages):
+        url = url.replace('page=' + str(page), 'page=' + str(page+1))
+        print(url)
+        driver.get(url) #open web browser with specific url
 
-    prices = driver.find_elements_by_xpath('//span[@class="cldt-price sc-font-xl sc-font-bold"]')
-    details = driver.find_elements_by_xpath('//ul[@data-item-name="vehicle-details"]')
+        prices = driver.find_elements_by_xpath('//span[@class="cldt-price sc-font-xl sc-font-bold"]')
+        details = driver.find_elements_by_xpath('//ul[@data-item-name="vehicle-details"]')
+        filters = driver.find_elements_by_xpath('//span[@class="sc-tag__label"]')
 
-    if len(prices) == len(details):
-        for i in range(len(details)):
-            car_detail = car_details_to_dict(prices[i].text, details[i].text)
-            dict_details.append(car_detail)
-    else:
-        print('uneven array lengths of prices and details')
+        car_name = filters[0].text
+        car_name_prep = str(car_name).replace(' ', '_') #remove spaces with underscore
 
-driver.close() #close web browser
+        if len(prices) == len(details):
+            for i in range(len(details)):
+                car_detail = car_details_to_dict(prices[i].text, details[i].text)
+                dict_details.append(car_detail)
+        else:
+            print('uneven array lengths of prices and details')
 
-writing_to_car_market_csv('/Users/Martin/GitKraken/CarMarketCrawling/Data', dict_details)
+    driver.close() #close web browser
 
-plotting_car_data(dict_details)
+    writing_to_car_market_csv(path='/Users/Martin/GitKraken/CarMarketCrawling/Data', name=car_name_prep, car_data_list=dict_details)
+
+    plotting_car_data(dict_details)
