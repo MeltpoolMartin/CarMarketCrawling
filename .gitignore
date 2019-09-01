@@ -1,3 +1,5 @@
 workspace.xml
 .idea
 *geckodriver.log
+
+venv/
