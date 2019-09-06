@@ -1,21 +1,55 @@
-from selenium import webdriver
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+from PyQt5.QtGui import QIcon
 
 
+class App(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 file dialogs - pythonspot.com'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        self.openFileNameDialog()
+        self.openFileNamesDialog()
+        self.saveFileDialog()
+
+        self.show()
+
+    def openFileNameDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "All Files (*);;Python Files (*.py)", options=options)
+        if fileName:
+            print(fileName)
+
+    def openFileNamesDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        files, _ = QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+                                                "All Files (*);;Python Files (*.py)", options=options)
+        if files:
+            print(files)
+
+    def saveFileDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
+                                                  "All Files (*);;Text Files (*.txt)", options=options)
+        if fileName:
+            print(fileName)
 
 
-
-driver = webdriver.Firefox()
-url = 'https://www.autoscout24.de/lst/land-rover/range-rover-evoque?sort=standard&desc=0&eq=140%2C155%2C23&gear=A&fuel=B&doorfrom=4&doorto=5&ustate=N%2CU&page=1&powerfrom=147&powertype=hp&cy=D&kmto=10000&ptype=M&atype=C'
-driver.get(url) #open web browser with specific url
-
-filter_result = driver.find_elements_by_xpath('//span[@class="sc-tag__label"]')
-#filter_result = driver.find_elements_by_xpath('/<span class=" cl-filters-summary-counter"')
-# <div class="sc-tag" data-test="tag-make-model-0"><span class="sc-tag__label">Land Rover Range Rover Evoque</span><div class="sc-tag__close"><as24-icon type="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M.031 14.142L14.173 0l1.414 1.414L1.445 15.556z"></path><path d="M1.415.031l14.142 14.142-1.415 1.414L0 1.445z"></path></svg></as24-icon></div></div>
-
-print(filter_result[0].text)
-
-filter_result
-for i in filter_result:
-    text = i.text
-    print(text)
-driver.close() #close web browser
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
